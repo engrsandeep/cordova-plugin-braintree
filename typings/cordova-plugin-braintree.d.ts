@@ -168,6 +168,10 @@ declare module BraintreePlugin {
         venmoAccount: {
             username: string;
         };
+        /** 
+         * Device data is complousory for advanced fraud management
+        */
+        deviceData:string;
     }
 }
 

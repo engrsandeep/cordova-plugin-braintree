@@ -14,13 +14,16 @@
 #import <BTCardNonce.h>
 #import <BraintreePayPal.h>
 #import <BraintreeApplePay.h>
+//#import <Braintree3DSecure.h>
 #import <BraintreeVenmo.h>
+#import <BTDataCollector.h>
 #import <BraintreePaymentFlow.h>
 #import "AppDelegate.h"
 
 @interface BraintreePlugin() <PKPaymentAuthorizationViewControllerDelegate>
 
 @property (nonatomic, strong) BTAPIClient *braintreeClient;
+@property (nonatomic, strong) BTDataCollector *dataCollector;
 @property NSString* token;
 
 @end
@@ -83,6 +86,9 @@ NSString *countryCode;
         [self.commandDelegate sendPluginResult:res callbackId:command.callbackId];
         return;
     }
+
+     self.dataCollector = [[BTDataCollector alloc] initWithAPIClient:self.braintreeClient];
+     
 
     NSString *bundle_id = [NSBundle mainBundle].bundleIdentifier;
     bundle_id = [bundle_id stringByAppendingString:@".payments"];
@@ -231,12 +237,16 @@ NSString *countryCode;
                         dropInUIcallbackId = nil;
                     }
                 } else {
-                    NSDictionary *dictionary = [self getPaymentUINonceResult:result.paymentMethod];
+                    [self.dataCollector collectCardFraudData:^(NSString * _Nonnull deviceData) {
+                         NSDictionary *dictionary = [self getPaymentUINonceResult:result.paymentMethod andDeviceData:deviceData];
+                    
+                        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dictionary];
 
-                    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dictionary];
-
-                    [self.commandDelegate sendPluginResult:pluginResult callbackId:dropInUIcallbackId];
-                    dropInUIcallbackId = nil;
+                        //[pluginResult setValue:deviceData forKey:@"deviceData"];                                             
+                        [self.commandDelegate sendPluginResult:pluginResult callbackId:dropInUIcallbackId];
+                        dropInUIcallbackId = nil;
+                        // Send deviceData to your server
+                    }];
                 }
             }
         }
@@ -252,17 +262,20 @@ NSString *countryCode;
     BTApplePayClient *applePayClient = [[BTApplePayClient alloc] initWithAPIClient:self.braintreeClient];
     [applePayClient tokenizeApplePayPayment:payment completion:^(BTApplePayCardNonce *tokenizedApplePayPayment, NSError *error) {
         if (tokenizedApplePayPayment) {
-            // On success, send nonce to your server for processing.
-            NSDictionary *dictionary = [self getPaymentUINonceResult:tokenizedApplePayPayment];
 
-            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+            [self.dataCollector collectCardFraudData:^(NSString * _Nonnull deviceData) {
+               
+                NSDictionary *dictionary = [self getPaymentUINonceResult:tokenizedApplePayPayment andDeviceData:deviceData];
+            
+                CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                           messageAsDictionary:dictionary];
-
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:dropInUIcallbackId];
-            dropInUIcallbackId = nil;
-
-            // Then indicate success or failure via the completion callback, e.g.
-            completion(PKPaymentAuthorizationStatusSuccess);
+                
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:dropInUIcallbackId];
+                dropInUIcallbackId = nil;
+                
+                // Then indicate success or failure via the completion callback, e.g.
+                completion(PKPaymentAuthorizationStatusSuccess);
+            }];
         } else {
             // Tokenization failed. Check `error` for the cause of the failure.
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Apple Pay tokenization failed"];
@@ -298,7 +311,7 @@ NSString *countryCode;
  * Helper used to return a dictionary of values from the given payment method nonce.
  * Handles several different types of nonces (eg for cards, Apple Pay, PayPal, etc).
  */
-- (NSDictionary*)getPaymentUINonceResult:(BTPaymentMethodNonce *)paymentMethodNonce {
+- (NSDictionary*)getPaymentUINonceResult:(BTPaymentMethodNonce *)paymentMethodNonce andDeviceData:(NSString *)deviceData{
 
     BTCardNonce *cardNonce;
     BTPayPalAccountNonce *payPalAccountNonce;

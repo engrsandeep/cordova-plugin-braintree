@@ -379,6 +379,7 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
             JSONObject json = new JSONObject();
 
             json.put("nonce", paymentMethodNonce.getNonce().toString());
+            json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment));
             //json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment));
             //json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment, this));
 
