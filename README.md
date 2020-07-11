@@ -1,8 +1,11 @@
 # Changes
 
 0.7.0 - update Braintree SDK to latest: iOS v4 and Anrdoid v3. Replace Carthage with Pods on iOS.
-added deviceData for Advanced fraud management, See more details below.
-https://developers.braintreepayments.com/guides/advanced-fraud-management-tools/client-side/ios/v4#collecting-device-data
+
+Added deviceData for Advanced fraud management, See more details below.
+
+iOS https://developers.braintreepayments.com/guides/advanced-fraud-management-tools/client-side/ios/v4#collecting-device-data
+Android https://developers.braintreepayments.com/guides/advanced-fraud-management-tools/device-data-collection/android/v3
 
 # NOTE
 This repo is a fork of https://github.com/mudam/cordova-plugin-braintree. All active development should point to there - this repo exists only so that I can keep pushing this plugin forward while Taracque maintains the stable branch.
