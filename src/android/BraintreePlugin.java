@@ -47,6 +47,7 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
     private CallbackContext _callbackContext = null;
     private BraintreeFragment braintreeFragment = null;
     private String temporaryToken = null;
+    private String deviceData = null;
 
     @Override
     public synchronized boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
@@ -114,14 +115,14 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
         temporaryToken = token;
 
         // After testing, it seems we do not need this!
-        // try {
-        //    braintreeFragment = BraintreeFragment.newInstance(this.cordova.getActivity(), temporaryToken);
-        //    braintreeFragment.addListener(this);
-        // } catch (InvalidArgumentException e) {
-        //     // There was an issue with your authorization string.
-        //     Log.e(TAG, "Error creating PayPal interface: " + e.getMessage());
-        //     _callbackContext.error(TAG + ": Error creating PayPal interface: " + e.getMessage());
-        // }
+       /* try {
+            braintreeFragment = BraintreeFragment.newInstance(this.cordova.getActivity(), temporaryToken);
+            braintreeFragment.addListener(this);
+     } catch (InvalidArgumentException e) {
+         // There was an issue with your authorization string.
+         Log.e(TAG, "Error creating PayPal interface: " + e.getMessage());
+            _callbackContext.error(TAG + ": Error creating PayPal interface: " + e.getMessage());
+        // }*/
 
         _callbackContext.success();
     }
@@ -156,6 +157,7 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
         dropInRequest = new DropInRequest().clientToken(temporaryToken);
         dropInRequest.cardholderNameStatus(CardForm.FIELD_REQUIRED);
         dropInRequest.vaultManager(true);
+        dropInRequest.collectDeviceData(true);
 
         // ThreeDSecureRequest threeDRequest = new ThreeDSecureRequest();
         // threeDRequest.amount(amount);
@@ -232,7 +234,7 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
             if (resultCode == Activity.RESULT_OK) {
                 DropInResult result = intent.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
                 paymentMethodNonce = result.getPaymentMethodNonce();
-
+                deviceData = result.getDeviceData();
                 Log.i(TAG, "DropIn Activity Result: paymentMethodNonce = " + paymentMethodNonce);
             }
 
@@ -378,9 +380,9 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
         try {
             JSONObject json = new JSONObject();
 
-            json.put("nonce", paymentMethodNonce.getNonce().toString());
-            json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment));
-            //json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment));
+             json.put("nonce", paymentMethodNonce.getNonce().toString());
+              json.put("deviceData", deviceData);
+            // json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment));
             //json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment, this));
 
             if (paymentMethodNonce instanceof PayPalAccountNonce) {
