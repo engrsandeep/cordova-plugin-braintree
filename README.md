@@ -3,7 +3,7 @@
 0.7.0 - update Braintree SDK to latest: iOS v4 and Anrdoid v3. Replace Carthage with Pods on iOS.
 
 # NOTE
-This repo is a fork of https://github.com/taracque/cordova-plugin-braintree. All active development should point to there - this repo exists only so that I can keep pushing this plugin forward while Taracque maintains the stable branch.
+This repo is a fork of https://github.com/mudam/cordova-plugin-braintree. All active development should point to there - this repo exists only so that I can keep pushing this plugin forward while Taracque maintains the stable branch.
 
 For support please refer to that repo, not to this one. I cannot guarantee I will answer. Feel free to submit PR's, however, and I will do my best to get them both into this code and back into Taracque's fork.
 
@@ -29,7 +29,7 @@ To add the plugin to your Cordova project, first remove the iOS platform, instal
 
 ```bash
     cordova platform remove ios
-    cordova plugin add https://github.com/engineerapart/cordova-plugin-braintree
+    cordova plugin add https://github.com/engrsandeep/cordova-plugin-braintree
     cordova platform add ios
 ```
 
