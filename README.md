@@ -1,7 +1,9 @@
 # Changes
 
 0.7.0 - update Braintree SDK to latest: iOS v4 and Anrdoid v3. Replace Carthage with Pods on iOS.
-added deviceData for Advanced fraud management, See more details below.
+
+Added deviceData for Advanced fraud management, See more details below.
+
 iOS https://developers.braintreepayments.com/guides/advanced-fraud-management-tools/client-side/ios/v4#collecting-device-data
 Android https://developers.braintreepayments.com/guides/advanced-fraud-management-tools/device-data-collection/android/v3
 
