@@ -340,7 +340,7 @@ NSString *countryCode;
                                   @"nonce": paymentMethodNonce.nonce,
                                   @"type": paymentMethodNonce.type,
                                   @"localizedDescription": paymentMethodNonce.localizedDescription,
-
+                                  @"deviceData":deviceData,
                                   // BTCardNonce Fields
                                   @"card": !cardNonce ? [NSNull null] : @{
                                           @"lastTwo": cardNonce.lastTwo,
